@@ -6,9 +6,12 @@ import {
   Plus, 
   X,
   Lock,
-  LayoutGrid
+  LayoutGrid,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 interface NavbarProps {
   searchQuery: string;
@@ -34,10 +37,11 @@ export const Navbar: React.FC<NavbarProps> = ({
   totalProductsCount
 }) => {
   const { isAdmin, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-2xs transition-colors">
+    <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-2xs transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
           
@@ -51,26 +55,26 @@ export const Navbar: React.FC<NavbarProps> = ({
                 setSelectedCategory('All');
                 if (isAdminDashboardOpen) onOpenAdminDashboard();
               }}
-              className="flex items-center gap-2 group"
+              className="flex items-center gap-2 group transition-transform hover:scale-[1.01]"
             >
-              <div className="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center shadow-xs">
+              <div className="w-8 h-8 rounded-lg bg-slate-900 dark:bg-white text-white dark:text-slate-900 flex items-center justify-center shadow-xs transition-colors">
                 <ShoppingBag className="w-4 h-4" />
               </div>
-              <span className="text-lg font-bold tracking-tight text-slate-900">
+              <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white transition-colors">
                 ShopLink
               </span>
             </a>
 
             {/* Navigation Links */}
-            <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-slate-600">
+            <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-slate-600 dark:text-slate-400">
               <button
                 onClick={() => {
                   setSelectedCategory('All');
                   setSearchQuery('');
                 }}
-                className={`hover:text-slate-900 transition-colors ${
+                className={`hover:text-slate-900 dark:hover:text-white transition-colors ${
                   selectedCategory === 'All' && !searchQuery
-                    ? 'text-slate-900 font-bold'
+                    ? 'text-slate-900 dark:text-white font-bold'
                     : ''
                 }`}
               >
@@ -78,9 +82,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
               <button
                 onClick={() => setSelectedCategory('Fashion & Apparel')}
-                className={`hover:text-slate-900 transition-colors ${
+                className={`hover:text-slate-900 dark:hover:text-white transition-colors ${
                   selectedCategory === 'Fashion & Apparel'
-                    ? 'text-slate-900 font-bold'
+                    ? 'text-slate-900 dark:text-white font-bold'
                     : ''
                 }`}
               >
@@ -88,9 +92,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
               <button
                 onClick={() => setSelectedCategory('Electronics & Tech')}
-                className={`hover:text-slate-900 transition-colors ${
+                className={`hover:text-slate-900 dark:hover:text-white transition-colors ${
                   selectedCategory === 'Electronics & Tech'
-                    ? 'text-slate-900 font-bold'
+                    ? 'text-slate-900 dark:text-white font-bold'
                     : ''
                 }`}
               >
@@ -98,9 +102,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
               <button
                 onClick={() => setSelectedCategory('Home & Decor')}
-                className={`hover:text-slate-900 transition-colors ${
+                className={`hover:text-slate-900 dark:hover:text-white transition-colors ${
                   selectedCategory === 'Home & Decor'
-                    ? 'text-slate-900 font-bold'
+                    ? 'text-slate-900 dark:text-white font-bold'
                     : ''
                 }`}
               >
@@ -110,21 +114,21 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {/* Right Controls */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             {/* Search Input */}
-            <div className="hidden sm:flex relative items-center w-56 lg:w-64">
+            <div className="hidden sm:flex relative items-center w-52 lg:w-60">
               <Search className="absolute left-3 w-3.5 h-3.5 text-slate-400" />
               <input
                 type="text"
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-8 pr-7 py-1.5 text-xs bg-slate-100 border border-slate-200 focus:border-slate-400 focus:bg-white rounded-lg outline-hidden text-slate-900 placeholder-slate-400 transition-all"
+                className="w-full pl-8 pr-7 py-1.5 text-xs bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-slate-400 dark:focus:border-slate-500 focus:bg-white dark:focus:bg-slate-900 rounded-lg outline-hidden text-slate-900 dark:text-white placeholder-slate-400 transition-all"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-2.5 text-slate-400 hover:text-slate-600"
+                  className="absolute right-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -134,18 +138,32 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Mobile Search Toggle */}
             <button
               onClick={() => setIsSearchOpen(!isSearchOpen)}
-              className="sm:hidden p-2 text-slate-600 hover:text-slate-900"
+              className="sm:hidden p-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
               title="Search"
             >
               <Search className="w-4 h-4" />
             </button>
 
-            {/* Admin Buttons */}
+            {/* Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              aria-label="Toggle theme"
+              title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              className="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            >
+              {theme === 'dark' ? (
+                <Sun className="w-4 h-4 text-amber-400 transition-transform rotate-0 hover:rotate-45" />
+              ) : (
+                <Moon className="w-4 h-4 text-slate-600 transition-transform -rotate-12 hover:rotate-0" />
+              )}
+            </button>
+
+            {/* Admin Controls */}
             {isAdmin ? (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <button
                   onClick={onOpenAddModal}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-lg shadow-xs transition-colors whitespace-nowrap"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 rounded-lg shadow-xs transition-colors whitespace-nowrap"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Add Product</span>
@@ -155,8 +173,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                   onClick={onOpenAdminDashboard}
                   className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-colors whitespace-nowrap ${
                     isAdminDashboardOpen
-                      ? 'bg-slate-900 text-white border-slate-900'
-                      : 'border-slate-300 text-slate-700 hover:bg-slate-100'
+                      ? 'bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900'
+                      : 'border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                   }`}
                 >
                   <LayoutGrid className="w-3.5 h-3.5" />
@@ -174,7 +192,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             ) : (
               <button
                 onClick={onOpenAuthModal}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:text-slate-900 border border-slate-200 hover:border-slate-300 bg-white rounded-lg transition-colors whitespace-nowrap"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-slate-800 rounded-lg transition-colors whitespace-nowrap"
               >
                 <Lock className="w-3 h-3 text-slate-400" />
                 <span>Admin Login</span>
@@ -196,14 +214,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 autoFocus
-                className="w-full pl-9 pr-8 py-2 text-xs bg-slate-100 border border-slate-200 rounded-lg text-slate-900 outline-hidden"
+                className="w-full pl-9 pr-8 py-2 text-xs bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white outline-hidden"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>

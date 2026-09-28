@@ -6,8 +6,7 @@ import {
   Trash2, 
   ExternalLink, 
   Copy, 
-  Check, 
-  MousePointerClick
+  Check
 } from 'lucide-react';
 import { Product, PLATFORMS } from '../types';
 
@@ -67,16 +66,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   return (
-    <section className="bg-white border-b border-slate-200 transition-colors">
+    <section className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 className="text-xl font-bold text-slate-900">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white">
               Admin Product Manager
             </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               Add new products, edit pricing and affiliate links, or remove items.
             </p>
           </div>
@@ -84,14 +83,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={onOpenAddModal}
-              className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-lg transition-colors shadow-xs"
+              className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 rounded-lg transition-colors shadow-xs"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Add Product</span>
             </button>
             <button
               onClick={onCloseDashboard}
-              className="px-3.5 py-2 text-xs font-medium text-slate-700 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+              className="px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
             >
               Close Panel
             </button>
@@ -100,27 +99,27 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         {/* Real Metrics Row */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
-            <span className="text-xs text-slate-500 font-medium">Total Products</span>
-            <div className="tabular-numbers text-2xl font-bold text-slate-900 mt-1">
+          <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Total Products</span>
+            <div className="tabular-numbers text-2xl font-bold text-slate-900 dark:text-white mt-1">
               {products.length}
             </div>
           </div>
-          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
-            <span className="text-xs text-slate-500 font-medium">Total Affiliate Clicks</span>
-            <div className="tabular-numbers text-2xl font-bold text-slate-900 mt-1">
+          <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Total Affiliate Clicks</span>
+            <div className="tabular-numbers text-2xl font-bold text-slate-900 dark:text-white mt-1">
               {totalClicks.toLocaleString()}
             </div>
           </div>
-          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
-            <span className="text-xs text-slate-500 font-medium">Featured Products</span>
-            <div className="tabular-numbers text-2xl font-bold text-slate-900 mt-1">
+          <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Featured Products</span>
+            <div className="tabular-numbers text-2xl font-bold text-slate-900 dark:text-white mt-1">
               {totalFeatured}
             </div>
           </div>
-          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
-            <span className="text-xs text-slate-500 font-medium">Marketplaces</span>
-            <div className="tabular-numbers text-2xl font-bold text-slate-900 mt-1">
+          <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Marketplaces</span>
+            <div className="tabular-numbers text-2xl font-bold text-slate-900 dark:text-white mt-1">
               {Object.keys(platformCounts).length}
             </div>
           </div>
@@ -135,7 +134,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               placeholder="Search uploaded products..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg outline-hidden text-slate-900 focus:border-slate-400 focus:bg-white"
+              className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-hidden text-slate-900 dark:text-white focus:border-slate-400 dark:focus:border-slate-500 focus:bg-white dark:focus:bg-slate-900 transition-colors"
             />
           </div>
 
@@ -144,8 +143,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               onClick={() => setSelectedPlatform('All')}
               className={`px-3 py-1 text-xs font-medium rounded-lg whitespace-nowrap transition-colors ${
                 selectedPlatform === 'All'
-                  ? 'bg-slate-900 text-white'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
               All ({products.length})
@@ -156,8 +155,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 onClick={() => setSelectedPlatform(plat)}
                 className={`px-3 py-1 text-xs font-medium rounded-lg whitespace-nowrap transition-colors ${
                   selectedPlatform === plat
-                    ? 'bg-slate-900 text-white'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                    ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
               >
                 {plat} ({platformCounts[plat]})
@@ -167,11 +166,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </div>
 
         {/* Table */}
-        <div className="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
+        <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden bg-white dark:bg-slate-900 shadow-2xs">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
+                <tr className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider text-[11px]">
                   <th className="py-3 px-4">Product</th>
                   <th className="py-3 px-4">Marketplace</th>
                   <th className="py-3 px-4">Price</th>
@@ -180,10 +179,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {filteredProducts.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="py-8 text-center text-slate-400">
+                    <td colSpan={6} className="py-8 text-center text-slate-400 dark:text-slate-500">
                       No products match your search. Click &quot;Add Product&quot; to upload an item.
                     </td>
                   </tr>
@@ -191,11 +190,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   filteredProducts.map((p) => (
                     <tr 
                       key={p.id}
-                      className="hover:bg-slate-50/70 transition-colors"
+                      className="hover:bg-slate-50/70 dark:hover:bg-slate-800/50 transition-colors"
                     >
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg overflow-hidden bg-slate-100 shrink-0 border border-slate-200">
+                          <div className="w-10 h-10 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-200 dark:border-slate-700">
                             <img
                               src={p.imageBase64}
                               alt={p.title}
@@ -204,29 +203,29 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             />
                           </div>
                           <div className="max-w-xs sm:max-w-sm">
-                            <p className="font-semibold text-slate-900 truncate">
+                            <p className="font-semibold text-slate-900 dark:text-white truncate">
                               {p.title}
                             </p>
-                            <p className="text-[11px] text-slate-400 truncate">
+                            <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate">
                               {p.description || 'No description provided'}
                             </p>
                           </div>
                         </div>
                       </td>
 
-                      <td className="py-3 px-4 font-semibold text-slate-700">
+                      <td className="py-3 px-4 font-semibold text-slate-700 dark:text-slate-300">
                         {p.platform}
                       </td>
 
-                      <td className="py-3 px-4 tabular-numbers font-semibold text-slate-900">
+                      <td className="py-3 px-4 tabular-numbers font-semibold text-slate-900 dark:text-white">
                         {p.currency}{p.price.toLocaleString()}
                       </td>
 
-                      <td className="py-3 px-4 text-slate-500">
+                      <td className="py-3 px-4 text-slate-500 dark:text-slate-400">
                         {p.category}
                       </td>
 
-                      <td className="py-3 px-4 tabular-numbers text-center text-slate-600 font-medium">
+                      <td className="py-3 px-4 tabular-numbers text-center text-slate-600 dark:text-slate-400 font-medium">
                         {p.clicks || 0}
                       </td>
 
@@ -234,7 +233,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <div className="flex items-center justify-end gap-1">
                           <button
                             onClick={() => handleCopyAffiliate(p.id, p.affiliateLink)}
-                            className="p-1.5 text-slate-400 hover:text-slate-700 rounded-md transition-colors"
+                            className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-md transition-colors"
                             title="Copy Affiliate Link"
                           >
                             {copiedId === p.id ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
@@ -243,21 +242,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             href={p.affiliateLink}
                             target="_blank"
                             rel="noreferrer"
-                            className="p-1.5 text-slate-400 hover:text-slate-700 rounded-md transition-colors"
+                            className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-md transition-colors"
                             title="Open Link"
                           >
                             <ExternalLink className="w-3.5 h-3.5" />
                           </a>
                           <button
                             onClick={() => onEditProduct(p)}
-                            className="p-1.5 text-slate-400 hover:text-slate-700 rounded-md transition-colors"
+                            className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-md transition-colors"
                             title="Edit"
                           >
                             <Edit3 className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => setDeleteConfirmId(p.id)}
-                            className="p-1.5 text-slate-400 hover:text-red-600 rounded-md transition-colors"
+                            className="p-1.5 text-slate-400 hover:text-red-600 dark:hover:text-red-400 rounded-md transition-colors"
                             title="Delete"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -274,27 +273,27 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
         {/* Delete Confirmation */}
         {deleteConfirmId && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-            <div className="w-full max-w-sm bg-white rounded-xl p-5 shadow-xl border border-slate-200 space-y-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-black/80 backdrop-blur-xs">
+            <div className="w-full max-w-sm bg-white dark:bg-slate-900 rounded-xl p-5 shadow-xl border border-slate-200 dark:border-slate-800 space-y-4">
               <div className="space-y-1">
-                <h3 className="text-sm font-bold text-slate-900">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white">
                   Delete this product?
                 </h3>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
                   This product will be permanently removed from your showcase and Firestore database.
                 </p>
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={() => setDeleteConfirmId(null)}
-                  className="flex-1 py-1.5 text-xs font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50"
+                  className="flex-1 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={() => confirmDelete(deleteConfirmId)}
                   disabled={isDeleting}
-                  className="flex-1 py-1.5 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg disabled:opacity-50"
+                  className="flex-1 py-1.5 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg disabled:opacity-50 transition-colors"
                 >
                   {isDeleting ? 'Deleting...' : 'Delete'}
                 </button>

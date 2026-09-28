@@ -2,11 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   X, 
   Upload, 
-  Image as ImageIcon, 
   Check, 
   AlertCircle, 
   Link as LinkIcon, 
-  Smartphone,
   CheckCircle2
 } from 'lucide-react';
 import { Product, MarketplacePlatform, PLATFORMS, DEFAULT_CATEGORIES } from '../types';
@@ -186,7 +184,7 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({
         } catch {
           setImageBase64(imageUrlInput.trim());
           setImageMetadata({
-            sizeFormatted: 'External CDN',
+            sizeFormatted: 'External',
             width: 0,
             height: 0,
             format: 'URL',
@@ -269,24 +267,24 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-zinc-950/70 backdrop-blur-xs overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 dark:bg-black/80 backdrop-blur-xs overflow-y-auto">
       <div 
-        className="w-full max-w-2xl bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-200 dark:border-zinc-800 my-8 overflow-hidden transform transition-all"
+        className="w-full max-w-2xl bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 my-8 overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="px-6 py-4 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <div>
-            <h2 className="font-display text-lg font-bold text-zinc-900 dark:text-white">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
               {editProduct ? 'Edit Showcase Product' : 'Add New Affiliate Product'}
             </h2>
-            <p className="text-xs text-zinc-500">
-              High-definition Base64 image encoding for Firestore
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Synced directly with Firebase Firestore database
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-md text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+            className="p-1 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -304,13 +302,13 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({
           {/* Image Section */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-                Product Photography (Base64) <span className="text-red-500">*</span>
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                Product Image <span className="text-red-500">*</span>
               </label>
               <button
                 type="button"
                 onClick={() => setShowUrlInput(!showUrlInput)}
-                className="text-[11px] text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300 flex items-center gap-1"
+                className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center gap-1 transition-colors"
               >
                 <LinkIcon className="w-3 h-3" />
                 <span>{showUrlInput ? 'Upload file' : 'Load from URL'}</span>
@@ -324,13 +322,13 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({
                   placeholder="https://example.com/item.jpg"
                   value={imageUrlInput}
                   onChange={(e) => setImageUrlInput(e.target.value)}
-                  className="flex-1 px-3 py-1.5 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg outline-hidden"
+                  className="flex-1 px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-hidden text-slate-900 dark:text-white"
                 />
                 <button
                   type="button"
                   onClick={handleLoadFromUrl}
                   disabled={!imageUrlInput.trim() || isCompressing}
-                  className="px-3 py-1.5 text-xs font-semibold bg-zinc-900 text-white rounded-lg hover:bg-zinc-800 disabled:opacity-50"
+                  className="px-3 py-1.5 text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-white rounded-lg disabled:opacity-50"
                 >
                   Load
                 </button>
@@ -338,8 +336,8 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({
             )}
 
             {imageBase64 ? (
-              <div className="p-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/40 flex items-center gap-4">
-                <div className="w-24 h-24 rounded-lg overflow-hidden bg-zinc-200 shrink-0 border border-zinc-300 dark:border-zinc-600">
+              <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex items-center gap-4">
+                <div className="w-24 h-24 rounded-lg overflow-hidden bg-slate-200 dark:bg-slate-700 shrink-0 border border-slate-300 dark:border-slate-600">
                   <img
                     src={imageBase64}
                     alt="Preview"
@@ -350,24 +348,24 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({
                   <div className="flex items-center gap-2">
                     <span className="font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
                       <CheckCircle2 className="w-3.5 h-3.5" />
-                      Optimized Base64 Ready
+                      Image Ready
                     </span>
                     {imageMetadata && (
-                      <span className="font-mono-num text-[11px] text-zinc-400">
+                      <span className="tabular-numbers text-[11px] text-slate-400 dark:text-slate-500">
                         {imageMetadata.format} · {imageMetadata.sizeFormatted}
                       </span>
                     )}
                   </div>
-                  <p className="text-[11px] text-zinc-500">
-                    High sharpness preserved on mobile and retina screens.
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    High clarity preserved across all devices.
                   </p>
                   <div className="flex gap-2 pt-1">
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:underline"
+                      className="text-xs font-medium text-slate-700 dark:text-slate-300 hover:underline"
                     >
-                      Replace photo
+                      Replace image
                     </button>
                     <button
                       type="button"
@@ -375,7 +373,7 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({
                         setImageBase64('');
                         setImageMetadata(null);
                       }}
-                      className="text-xs font-medium text-red-600 hover:underline"
+                      className="text-xs font-medium text-red-600 dark:text-red-400 hover:underline"
                     >
                       Remove
                     </button>
@@ -385,21 +383,21 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({
             ) : (
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="border border-dashed border-zinc-300 dark:border-zinc-700 rounded-xl p-6 text-center cursor-pointer hover:border-zinc-500 transition-colors"
+                className="border border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-6 text-center cursor-pointer hover:border-slate-500 dark:hover:border-slate-500 transition-colors"
               >
                 <div className="flex flex-col items-center gap-2">
-                  <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-500">
+                  <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400">
                     {isCompressing ? (
-                      <div className="w-5 h-5 border-2 border-zinc-900 border-t-transparent rounded-full animate-spin" />
+                      <div className="w-5 h-5 border-2 border-slate-900 dark:border-white border-t-transparent rounded-full animate-spin" />
                     ) : (
                       <Upload className="w-5 h-5" />
                     )}
                   </div>
-                  <div className="text-xs text-zinc-600 dark:text-zinc-300 font-medium">
-                    {isCompressing ? 'Encoding high-quality image...' : 'Click to choose image or drag & drop'}
+                  <div className="text-xs text-slate-600 dark:text-slate-300 font-medium">
+                    {isCompressing ? 'Processing image...' : 'Click to choose image or drag & drop'}
                   </div>
-                  <p className="text-[11px] text-zinc-400">
-                    Auto-optimized to fit safely inside Firestore 1MB limits
+                  <p className="text-[11px] text-slate-400 dark:text-slate-500">
+                    High definition WebP/JPEG format
                   </p>
                 </div>
               </div>
@@ -423,7 +421,7 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({
 
           {/* Product Title */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 mb-1.5">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
               Product Title <span className="text-red-500">*</span>
             </label>
             <input
@@ -432,13 +430,13 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
-              className="w-full px-3.5 py-2 text-sm bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 rounded-lg focus:border-zinc-400 outline-hidden text-zinc-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:border-slate-400 dark:focus:border-slate-500 outline-hidden text-slate-900 dark:text-white"
             />
           </div>
 
           {/* Marketplace Platform */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 mb-2">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-2">
               Marketplace Platform <span className="text-red-500">*</span>
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -451,8 +449,8 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({
                     onClick={() => setPlatform(plat)}
                     className={`py-2 px-3 text-xs font-medium rounded-lg border transition-colors flex items-center justify-between ${
                       isSelected
-                        ? 'border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-zinc-900'
-                        : 'border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:border-zinc-400'
+                        ? 'border-slate-900 bg-slate-900 text-white dark:border-white dark:bg-white dark:text-slate-900'
+                        : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
                     }`}
                   >
                     <span>{PLATFORMS[plat].label}</span>
@@ -469,7 +467,7 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({
                   placeholder="Specify marketplace name"
                   value={customPlatform}
                   onChange={(e) => setCustomPlatform(e.target.value)}
-                  className="w-full px-3 py-1.5 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-900 dark:text-white"
+                  className="w-full px-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white"
                 />
               </div>
             )}
@@ -478,13 +476,13 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({
           {/* Pricing */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
                 Currency
               </label>
               <select
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value)}
-                className="w-full px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 rounded-lg outline-hidden text-zinc-900 dark:text-white"
+                className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-hidden text-slate-900 dark:text-white"
               >
                 <option value="₹">₹ (INR)</option>
                 <option value="$">$ (USD)</option>
@@ -495,7 +493,7 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
                 Deal Price <span className="text-red-500">*</span>
               </label>
               <input
@@ -505,12 +503,12 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
                 required
-                className="w-full px-3 py-2 text-xs font-mono-num font-semibold bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 rounded-lg outline-hidden text-zinc-900 dark:text-white"
+                className="w-full px-3 py-2 text-xs tabular-numbers font-semibold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-hidden text-slate-900 dark:text-white"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
                 Original MRP
               </label>
               <input
@@ -519,14 +517,14 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({
                 placeholder="2499"
                 value={originalPrice}
                 onChange={(e) => setOriginalPrice(e.target.value)}
-                className="w-full px-3 py-2 text-xs font-mono-num bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 rounded-lg outline-hidden text-zinc-900 dark:text-white"
+                className="w-full px-3 py-2 text-xs tabular-numbers bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-hidden text-slate-900 dark:text-white"
               />
             </div>
           </div>
 
           {/* Affiliate Link */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 mb-1.5">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
               Affiliate Redirect URL <span className="text-red-500">*</span>
             </label>
             <input
@@ -535,20 +533,20 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({
               value={affiliateLink}
               onChange={(e) => setAffiliateLink(e.target.value)}
               required
-              className="w-full px-3.5 py-2 text-xs font-mono bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 rounded-lg outline-hidden text-zinc-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-xs font-mono bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-hidden text-slate-900 dark:text-white"
             />
           </div>
 
           {/* Category & Featured */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
                 Category
               </label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 rounded-lg outline-hidden text-zinc-900 dark:text-white"
+                className="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-hidden text-slate-900 dark:text-white"
               >
                 {DEFAULT_CATEGORIES.filter((c) => c !== 'All').map((cat) => (
                   <option key={cat} value={cat}>
@@ -564,10 +562,10 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({
                   type="checkbox"
                   checked={featured}
                   onChange={(e) => setFeatured(e.target.checked)}
-                  className="w-4 h-4 rounded-xs text-zinc-900 focus:ring-zinc-900"
+                  className="w-4 h-4 rounded-xs text-slate-900 focus:ring-slate-900"
                 />
-                <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">
-                  Feature in Curator Spotlight
+                <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                  Feature in Featured Section
                 </span>
               </label>
             </div>
@@ -575,47 +573,47 @@ export const AdminProductModal: React.FC<AdminProductModalProps> = ({
 
           {/* Tags */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 mb-1.5">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
               Keywords (comma separated)
             </label>
             <input
               type="text"
-              placeholder="Outfit reel, Streetwear, Amazon find"
+              placeholder="Outfit, Audio, Desk Setup"
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
-              className="w-full px-3.5 py-2 text-xs bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 rounded-lg outline-hidden text-zinc-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-hidden text-slate-900 dark:text-white"
             />
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 mb-1.5">
-              Description &amp; Curator Notes
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+              Product Description &amp; Details
             </label>
             <textarea
               rows={3}
-              placeholder="Sizing recommendations, styling notes, fabric quality, why you like it..."
+              placeholder="Add product specifications, sizing notes, fabric details..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-3.5 py-2 text-xs sm:text-sm bg-zinc-50 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 rounded-lg outline-hidden text-zinc-900 dark:text-white"
+              className="w-full px-3.5 py-2 text-xs sm:text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-hidden text-slate-900 dark:text-white"
             />
           </div>
 
           {/* Bottom Actions */}
-          <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-end gap-3">
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-900"
+              className="px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting || isCompressing}
-              className="px-5 py-2 text-xs font-semibold text-white bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200 rounded-lg transition-colors disabled:opacity-50"
+              className="px-5 py-2 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50"
             >
-              {isSubmitting ? 'Saving...' : editProduct ? 'Update Product' : 'Publish Product'}
+              {isSubmitting ? 'Saving to Database...' : editProduct ? 'Update Product' : 'Save & Publish Product'}
             </button>
           </div>
         </form>

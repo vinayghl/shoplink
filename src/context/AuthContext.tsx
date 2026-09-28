@@ -21,10 +21,10 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const ADMIN_PASSKEY_HASH = 'admin8899';
+// Designated Master Passkey
+const VALID_PASSKEYS = ['Shoplink2026', 'shoplink2026'];
 const ADMIN_STORAGE_KEY = 'shoplink_single_admin_session';
 
-// Safe localStorage helper for cross-origin & privacy modes
 const safeStorage = {
   getItem: (key: string): string | null => {
     try {
@@ -79,7 +79,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setLoading(false);
         },
         (error) => {
-          // Gracefully handle domain or network auth errors without crashing
           console.warn('Firebase Auth State Notice:', error.message);
           setLoading(false);
         }
@@ -104,7 +103,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         safeStorage.setItem(ADMIN_STORAGE_KEY, 'true');
         return true;
       } else {
-        setAuthError(`Unauthorized: ${email} is not the designated admin (${ADMIN_EMAIL}). Only the showcase owner can access the admin panel.`);
+        setAuthError(`Unauthorized: ${email} is not the designated admin (${ADMIN_EMAIL}).`);
         await firebaseSignOut(auth);
         setIsAdmin(false);
         safeStorage.removeItem(ADMIN_STORAGE_KEY);
@@ -113,13 +112,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (err: any) {
       console.warn('Google sign-in error:', err);
       if (err.code === 'auth/popup-closed-by-user') {
-        setAuthError('Sign-in cancelled by user.');
+        setAuthError('Sign-in was cancelled.');
       } else if (err.code === 'auth/popup-blocked') {
-        setAuthError('Popup blocked by browser. Please allow popups or use the Admin Secret Key.');
+        setAuthError('Popup blocked by browser. Please use the Admin Passkey option.');
       } else if (err.code === 'auth/unauthorized-domain') {
-        setAuthError('This domain is not in Firebase authorized domains. You can sign in using the Master Passkey below.');
+        setAuthError('This domain is not in Firebase authorized domains. Please sign in using your Admin Passkey.');
       } else {
-        setAuthError(err.message || 'Authentication failed. You can sign in using the Master Passkey.');
+        setAuthError(err.message || 'Authentication error. Please sign in using your Admin Passkey.');
       }
       return false;
     }
@@ -127,12 +126,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loginWithAdminKey = (key: string): boolean => {
     setAuthError(null);
-    if (key.trim() === ADMIN_PASSKEY_HASH || key.trim() === 'shoplink2026') {
+    const cleaned = key.trim();
+    if (VALID_PASSKEYS.includes(cleaned) || VALID_PASSKEYS.includes(cleaned.toLowerCase())) {
       setIsAdmin(true);
       safeStorage.setItem(ADMIN_STORAGE_KEY, 'true');
       return true;
     } else {
-      setAuthError('Invalid Admin Passkey. Please check and try again.');
+      setAuthError('Incorrect passkey. Please check and try again.');
       return false;
     }
   };

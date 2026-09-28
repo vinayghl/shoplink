@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { testConnection } from './firebase';
+import { ThemeProvider } from './context/ThemeContext';
+import { testConnection, ADMIN_EMAIL } from './firebase';
 import { Product } from './types';
 import { 
   subscribeToProducts, 
   createProduct, 
   updateProduct, 
   deleteProduct, 
-  recordProductClick 
+  recordProductClick,
+  deduplicateProducts
 } from './services/productService';
 import { Navbar } from './components/Navbar';
 import { HeroCreatorBanner } from './components/HeroCreatorBanner';
@@ -56,7 +58,7 @@ function ShowcaseContent() {
   useEffect(() => {
     setLoading(true);
     const unsubscribe = subscribeToProducts((loadedProducts) => {
-      setProducts(loadedProducts);
+      setProducts(deduplicateProducts(loadedProducts));
       setLoading(false);
     });
 
@@ -66,9 +68,22 @@ function ShowcaseContent() {
   const handleSaveProduct = async (productData: Omit<Product, 'id'>, id?: string) => {
     if (id) {
       await updateProduct(id, productData);
+      setProducts((prev) => 
+        prev.map((p) => (p.id === id ? { ...p, ...productData, updatedAt: new Date().toISOString() } : p))
+      );
       showToast('Product updated successfully.');
     } else {
-      await createProduct(productData);
+      const newId = await createProduct(productData);
+      const now = new Date().toISOString();
+      const newP: Product = {
+        ...productData,
+        id: newId,
+        clicks: 0,
+        createdAt: now,
+        updatedAt: now,
+        creatorEmail: ADMIN_EMAIL
+      };
+      setProducts((prev) => deduplicateProducts([newP, ...prev]));
       showToast('New product added to catalog.');
     }
     setEditingProduct(null);
@@ -76,6 +91,7 @@ function ShowcaseContent() {
 
   const handleDeleteProduct = async (id: string) => {
     await deleteProduct(id);
+    setProducts((prev) => prev.filter((p) => p.id !== id));
     showToast('Product removed from catalog.');
   };
 
@@ -126,7 +142,7 @@ function ShowcaseContent() {
       return 0;
     });
 
-    return result;
+    return deduplicateProducts(result);
   }, [products, searchQuery, selectedCategory, selectedPlatform, sortBy]);
 
   const featuredProducts = useMemo(() => {
@@ -134,11 +150,11 @@ function ShowcaseContent() {
   }, [products]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 transition-colors">
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
       
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 px-4 py-2.5 bg-slate-900 text-white rounded-lg shadow-lg text-xs font-semibold flex items-center gap-2 animate-in fade-in duration-150">
+        <div className="fixed bottom-6 right-6 z-50 px-4 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg shadow-xl text-xs font-semibold flex items-center gap-2 animate-in fade-in duration-150">
           <span>{toastMessage}</span>
         </div>
       )}
@@ -192,12 +208,12 @@ function ShowcaseContent() {
           {/* Featured Section */}
           {!searchQuery && selectedCategory === 'All' && selectedPlatform === 'All' && featuredProducts.length > 0 && (
             <section className="space-y-4">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
                 <div className="flex items-baseline gap-2">
-                  <h2 className="text-base font-bold text-slate-900 uppercase tracking-tight">
+                  <h2 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-tight">
                     Featured Products
                   </h2>
-                  <span className="text-xs text-slate-400">Recommended picks</span>
+                  <span className="text-xs text-slate-400 dark:text-slate-500">Recommended picks</span>
                 </div>
               </div>
 
@@ -218,37 +234,37 @@ function ShowcaseContent() {
 
           {/* All Catalog Products */}
           <section className="space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
               <div className="flex items-baseline gap-2">
-                <h2 className="text-base font-bold text-slate-900 uppercase tracking-tight">
+                <h2 className="text-base font-bold text-slate-900 dark:text-white uppercase tracking-tight">
                   {!searchQuery && selectedCategory === 'All' && selectedPlatform === 'All' && featuredProducts.length > 0 ? 'All Products' : selectedCategory}
                 </h2>
                 {selectedPlatform !== 'All' && (
-                  <span className="text-xs text-slate-500">
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
                     on {selectedPlatform}
                   </span>
                 )}
               </div>
               
-              <span className="tabular-numbers text-xs text-slate-500 font-medium">
+              <span className="tabular-numbers text-xs text-slate-500 dark:text-slate-400 font-medium">
                 {displayProducts.length} items
               </span>
             </div>
 
             {loading ? (
               <div className="py-24 flex flex-col items-center justify-center space-y-2">
-                <div className="w-8 h-8 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
-                <p className="text-xs text-slate-500">Loading products...</p>
+                <div className="w-8 h-8 border-2 border-slate-900 dark:border-white border-t-transparent rounded-full animate-spin" />
+                <p className="text-xs text-slate-500 dark:text-slate-400">Loading products...</p>
               </div>
             ) : displayProducts.length === 0 ? (
-              <div className="py-16 text-center space-y-3 bg-white rounded-xl border border-slate-200 p-8">
-                <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center mx-auto text-slate-400">
+              <div className="py-16 text-center space-y-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-8">
+                <div className="w-12 h-12 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto text-slate-400">
                   <Search className="w-5 h-5" />
                 </div>
-                <h3 className="text-sm font-bold text-slate-900">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white">
                   No matching products found
                 </h3>
-                <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
                   Try checking your search keywords or clearing your platform filter.
                 </p>
                 <div className="pt-1">
@@ -258,7 +274,7 @@ function ShowcaseContent() {
                       setSelectedCategory('All');
                       setSelectedPlatform('All');
                     }}
-                    className="px-4 py-1.5 text-xs font-semibold text-slate-700 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
+                    className="px-4 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                   >
                     Reset filters
                   </button>
@@ -323,8 +339,10 @@ function ShowcaseContent() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <ShowcaseContent />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <ShowcaseContent />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
