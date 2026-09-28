@@ -14,7 +14,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     try {
       const saved = localStorage.getItem('shoplink_theme');
       if (saved === 'dark' || saved === 'light') return saved;
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
+      if (typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        return 'dark';
+      }
     } catch {}
     return 'light';
   });
@@ -22,10 +24,22 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => {
     try {
       const root = document.documentElement;
+      const body = document.body;
+      
       if (theme === 'dark') {
         root.classList.add('dark');
+        root.setAttribute('data-theme', 'dark');
+        root.style.colorScheme = 'dark';
+        if (body) {
+          body.classList.add('dark');
+        }
       } else {
         root.classList.remove('dark');
+        root.setAttribute('data-theme', 'light');
+        root.style.colorScheme = 'light';
+        if (body) {
+          body.classList.remove('dark');
+        }
       }
       localStorage.setItem('shoplink_theme', theme);
     } catch (e) {

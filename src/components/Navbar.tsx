@@ -144,17 +144,30 @@ export const Navbar: React.FC<NavbarProps> = ({
               <Search className="w-4 h-4" />
             </button>
 
-            {/* Theme Toggle Button */}
+            {/* Theme Toggle Switch */}
             <button
               onClick={toggleTheme}
-              aria-label="Toggle theme"
+              type="button"
+              role="switch"
+              aria-checked={theme === 'dark'}
+              aria-label="Toggle dark mode"
               title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-              className="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-medium transition-all shadow-2xs cursor-pointer select-none"
             >
               {theme === 'dark' ? (
-                <Sun className="w-4 h-4 text-amber-400 transition-transform rotate-0 hover:rotate-45" />
+                <>
+                  <div className="w-4 h-4 rounded-full bg-amber-400/20 text-amber-400 flex items-center justify-center">
+                    <Sun className="w-3 h-3" />
+                  </div>
+                  <span className="hidden sm:inline text-[11px] font-semibold">Dark</span>
+                </>
               ) : (
-                <Moon className="w-4 h-4 text-slate-600 transition-transform -rotate-12 hover:rotate-0" />
+                <>
+                  <div className="w-4 h-4 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center">
+                    <Moon className="w-3 h-3" />
+                  </div>
+                  <span className="hidden sm:inline text-[11px] font-semibold">Light</span>
+                </>
               )}
             </button>
 

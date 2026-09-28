@@ -6,9 +6,12 @@ import {
   ArrowUpRight,
   Lock,
   LogOut,
-  ShoppingBag
+  ShoppingBag,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 interface FooterProps {
   onOpenAuthModal: () => void;
@@ -20,6 +23,7 @@ export const Footer: React.FC<FooterProps> = ({
   onOpenAdminDashboard
 }) => {
   const { isAdmin, adminEmail, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <footer className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 transition-colors duration-200 mt-16">
@@ -125,9 +129,27 @@ export const Footer: React.FC<FooterProps> = ({
         </div>
 
         {/* Bottom */}
-        <div className="pt-6 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 dark:text-slate-500 gap-2">
+        <div className="pt-6 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 dark:text-slate-500 gap-3">
           <p>© {new Date().getFullYear()} ShopLink Showcase. All brand trademarks belong to their respective marketplace owners.</p>
-          <p>Optimized for mobile, tablet &amp; desktop.</p>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={toggleTheme}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium transition-colors"
+            >
+              {theme === 'dark' ? (
+                <>
+                  <Sun className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Switch to Light Mode</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-3.5 h-3.5 text-slate-600" />
+                  <span>Switch to Dark Mode</span>
+                </>
+              )}
+            </button>
+            <p>Optimized for all devices</p>
+          </div>
         </div>
 
       </div>
