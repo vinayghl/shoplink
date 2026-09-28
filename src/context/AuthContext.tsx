@@ -21,44 +21,76 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const ADMIN_PASSKEY_HASH = 'admin8899'; // Default single-admin secret key
+const ADMIN_PASSKEY_HASH = 'admin8899';
 const ADMIN_STORAGE_KEY = 'shoplink_single_admin_session';
+
+// Safe localStorage helper for cross-origin & privacy modes
+const safeStorage = {
+  getItem: (key: string): string | null => {
+    try {
+      return typeof window !== 'undefined' ? localStorage.getItem(key) : null;
+    } catch {
+      return null;
+    }
+  },
+  setItem: (key: string, val: string) => {
+    try {
+      if (typeof window !== 'undefined') localStorage.setItem(key, val);
+    } catch {}
+  },
+  removeItem: (key: string) => {
+    try {
+      if (typeof window !== 'undefined') localStorage.removeItem(key);
+    } catch {}
+  }
+};
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState<boolean>(() => {
-    return localStorage.getItem(ADMIN_STORAGE_KEY) === 'true';
+    return safeStorage.getItem(ADMIN_STORAGE_KEY) === 'true';
   });
   const [loading, setLoading] = useState<boolean>(true);
   const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      setUser(firebaseUser);
-      if (firebaseUser) {
-        // Verify if user is the designated single admin
-        const email = firebaseUser.email?.toLowerCase();
-        if (email === ADMIN_EMAIL.toLowerCase()) {
-          setIsAdmin(true);
-          localStorage.setItem(ADMIN_STORAGE_KEY, 'true');
-        } else {
-          // Check if previously authorized via admin passkey
-          const stored = localStorage.getItem(ADMIN_STORAGE_KEY);
-          if (stored !== 'true') {
-            setIsAdmin(false);
+    try {
+      const unsubscribe = onAuthStateChanged(
+        auth, 
+        (firebaseUser) => {
+          setUser(firebaseUser);
+          if (firebaseUser) {
+            const email = firebaseUser.email?.toLowerCase();
+            if (email === ADMIN_EMAIL.toLowerCase()) {
+              setIsAdmin(true);
+              safeStorage.setItem(ADMIN_STORAGE_KEY, 'true');
+            } else {
+              const stored = safeStorage.getItem(ADMIN_STORAGE_KEY);
+              if (stored !== 'true') {
+                setIsAdmin(false);
+              }
+            }
+          } else {
+            const stored = safeStorage.getItem(ADMIN_STORAGE_KEY);
+            if (stored !== 'true') {
+              setIsAdmin(false);
+            }
           }
+          setLoading(false);
+        },
+        (error) => {
+          // Gracefully handle domain or network auth errors without crashing
+          console.warn('Firebase Auth State Notice:', error.message);
+          setLoading(false);
         }
-      } else {
-        // If no firebase user, check local admin passkey session
-        const stored = localStorage.getItem(ADMIN_STORAGE_KEY);
-        if (stored !== 'true') {
-          setIsAdmin(false);
-        }
-      }
-      setLoading(false);
-    });
+      );
 
-    return () => unsubscribe();
+      return () => unsubscribe();
+    } catch (err) {
+      console.warn('Firebase Auth initialization fallback:', err);
+      setLoading(false);
+      return () => {};
+    }
   }, []);
 
   const loginWithGoogle = async (): Promise<boolean> => {
@@ -69,15 +101,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (email === ADMIN_EMAIL.toLowerCase()) {
         setIsAdmin(true);
-        localStorage.setItem(ADMIN_STORAGE_KEY, 'true');
+        safeStorage.setItem(ADMIN_STORAGE_KEY, 'true');
         return true;
       } else {
-        // User logged in with a different email than the single designated admin
         setAuthError(`Unauthorized: ${email} is not the designated admin (${ADMIN_EMAIL}). Only the showcase owner can access the admin panel.`);
-        // Sign out unauthorized user
         await firebaseSignOut(auth);
         setIsAdmin(false);
-        localStorage.removeItem(ADMIN_STORAGE_KEY);
+        safeStorage.removeItem(ADMIN_STORAGE_KEY);
         return false;
       }
     } catch (err: any) {
@@ -86,8 +116,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setAuthError('Sign-in cancelled by user.');
       } else if (err.code === 'auth/popup-blocked') {
         setAuthError('Popup blocked by browser. Please allow popups or use the Admin Secret Key.');
+      } else if (err.code === 'auth/unauthorized-domain') {
+        setAuthError('This domain is not in Firebase authorized domains. You can sign in using the Master Passkey below.');
       } else {
-        setAuthError(err.message || 'Authentication failed. You can also sign in with the Admin Secret Key.');
+        setAuthError(err.message || 'Authentication failed. You can sign in using the Master Passkey.');
       }
       return false;
     }
@@ -97,7 +129,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAuthError(null);
     if (key.trim() === ADMIN_PASSKEY_HASH || key.trim() === 'shoplink2026') {
       setIsAdmin(true);
-      localStorage.setItem(ADMIN_STORAGE_KEY, 'true');
+      safeStorage.setItem(ADMIN_STORAGE_KEY, 'true');
       return true;
     } else {
       setAuthError('Invalid Admin Passkey. Please check and try again.');
@@ -109,10 +141,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await firebaseSignOut(auth);
     } catch (err) {
-      console.error('Logout error', err);
+      console.warn('Logout notice:', err);
     }
     setIsAdmin(false);
-    localStorage.removeItem(ADMIN_STORAGE_KEY);
+    safeStorage.removeItem(ADMIN_STORAGE_KEY);
   };
 
   const clearAuthError = () => setAuthError(null);

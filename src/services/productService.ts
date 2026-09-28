@@ -48,9 +48,8 @@ export function subscribeToProducts(
   onProducts: (products: Product[]) => void,
   onError?: (err: unknown) => void
 ): () => void {
-  const collectionRef = collection(db, 'products');
-
   try {
+    const collectionRef = collection(db, 'products');
     const unsubscribe = onSnapshot(
       collectionRef,
       (snapshot) => {
