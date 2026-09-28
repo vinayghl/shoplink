@@ -4,22 +4,20 @@ import {
   setDoc, 
   updateDoc, 
   deleteDoc, 
-  onSnapshot, 
-  getDocs,
-  writeBatch
+  onSnapshot
 } from 'firebase/firestore';
 import { db, auth, OperationType, handleFirestoreError, ADMIN_EMAIL } from '../firebase';
 import { Product } from '../types';
-import { INITIAL_PRODUCTS } from '../data/initialProducts';
 
-const LOCAL_STORAGE_KEY = 'shoplink_v3_products_cache';
+const LOCAL_STORAGE_KEY = 'shoplink_v4_admin_products';
+const LEGACY_PRESET_IDS = new Set(['prod_1', 'prod_2', 'prod_3', 'prod_4', 'prod_5']);
 
 // Deduplicate helper: ensures no two products share the same ID
 export function deduplicateProducts(list: Product[]): Product[] {
   const seen = new Set<string>();
   const result: Product[] = [];
   for (const item of list) {
-    if (item && item.id && !seen.has(item.id)) {
+    if (item && item.id && !seen.has(item.id) && !LEGACY_PRESET_IDS.has(item.id)) {
       seen.add(item.id);
       result.push(item);
     }
@@ -27,20 +25,20 @@ export function deduplicateProducts(list: Product[]): Product[] {
   return result;
 }
 
-// Helper to get cached products from localStorage or fallback
+// Helper to get cached products from localStorage (NEVER defaults to fake preset products)
 export function getLocalCachedProducts(): Product[] {
   try {
     const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) {
+      if (Array.isArray(parsed)) {
         return deduplicateProducts(parsed);
       }
     }
   } catch (e) {
     console.warn('Failed to parse local cached products', e);
   }
-  return deduplicateProducts(INITIAL_PRODUCTS);
+  return [];
 }
 
 // Helper to save products locally
@@ -53,39 +51,43 @@ export function saveLocalCachedProducts(products: Product[]) {
   }
 }
 
-// Seeds the initial products into Firestore if the collection is empty
-async function seedInitialProductsIfEmpty() {
+// One-time cleanup: Permanently remove the 5 fake test products from Firestore if they were previously seeded
+let hasCleanedUpLegacy = false;
+async function purgeLegacyPresetsFromFirestore() {
+  if (hasCleanedUpLegacy) return;
+  hasCleanedUpLegacy = true;
+
   try {
-    const colRef = collection(db, 'products');
-    const snap = await getDocs(colRef);
-    if (snap.empty) {
-      console.log('Seeding initial products into Firestore...');
-      for (const p of INITIAL_PRODUCTS) {
-        await setDoc(doc(db, 'products', p.id), {
-          ...p,
-          clicks: p.clicks || 0,
-          createdAt: p.createdAt || new Date().toISOString(),
-          updatedAt: p.updatedAt || new Date().toISOString(),
-          creatorEmail: p.creatorEmail || ADMIN_EMAIL,
-          adminPasskey: 'Shoplink2026'
-        });
+    const legacyIds = ['prod_1', 'prod_2', 'prod_3', 'prod_4', 'prod_5'];
+    for (const legacyId of legacyIds) {
+      try {
+        const docRef = doc(db, 'products', legacyId);
+        await deleteDoc(docRef);
+      } catch {
+        // Document might already be gone
       }
-      console.log('Initial products successfully seeded into Firestore.');
     }
+
+    // Also purge from local storage
+    const current = getLocalCachedProducts();
+    const filtered = current.filter(p => !LEGACY_PRESET_IDS.has(p.id));
+    saveLocalCachedProducts(filtered);
+    console.log('Legacy fake test products successfully purged.');
   } catch (err) {
-    console.warn('Notice while checking Firestore seed:', err);
+    console.warn('Notice during legacy preset cleanup:', err);
   }
 }
 
 /**
- * Subscribes to products from Firestore with seamless local cache fallback and deduplication.
+ * Subscribes to real admin products from Firestore in real-time.
+ * Only genuine products uploaded by the administrator are kept.
  */
 export function subscribeToProducts(
   onProducts: (products: Product[]) => void,
   onError?: (err: unknown) => void
 ): () => void {
-  // Trigger background seed check
-  seedInitialProductsIfEmpty();
+  // Purge any legacy fake presets in the background
+  purgeLegacyPresetsFromFirestore();
 
   try {
     const collectionRef = collection(db, 'products');
@@ -95,6 +97,12 @@ export function subscribeToProducts(
         if (!snapshot.empty) {
           const remoteItems: Product[] = [];
           snapshot.forEach((docSnap) => {
+            if (LEGACY_PRESET_IDS.has(docSnap.id)) {
+              // Delete on sight if found
+              deleteDoc(doc(db, 'products', docSnap.id)).catch(() => {});
+              return;
+            }
+
             const data = docSnap.data();
             remoteItems.push({
               id: docSnap.id,
@@ -117,26 +125,21 @@ export function subscribeToProducts(
             });
           });
 
-          // Merge with any local cache items so no newly added local items vanish
-          const localItems = getLocalCachedProducts();
-          const remoteIds = new Set(remoteItems.map(p => p.id));
-          const localOnly = localItems.filter(p => !remoteIds.has(p.id) && !p.id.startsWith('prod_'));
-
-          const merged = deduplicateProducts([...remoteItems, ...localOnly]);
+          const cleanList = deduplicateProducts(remoteItems);
 
           // Sort by featured first, then newest
-          merged.sort((a, b) => {
+          cleanList.sort((a, b) => {
             if (a.featured && !b.featured) return -1;
             if (!a.featured && b.featured) return 1;
             return new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime();
           });
 
-          saveLocalCachedProducts(merged);
-          onProducts(merged);
+          saveLocalCachedProducts(cleanList);
+          onProducts(cleanList);
         } else {
-          // If remote collection is completely empty, provide deduplicated local products
-          const local = getLocalCachedProducts();
-          onProducts(local);
+          // If remote collection is completely empty, the showcase has 0 products
+          saveLocalCachedProducts([]);
+          onProducts([]);
         }
       },
       (error) => {
@@ -157,8 +160,8 @@ export function subscribeToProducts(
 /**
  * Creates a new product in Firestore and updates local cache.
  */
-export async function createProduct(product: Omit<Product, 'id'>): Promise<string> {
-  const id = 'prod_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 7);
+export async function createProduct(product: Omit<Product, 'id'>): Promise<Product> {
+  const id = 'prod_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 8);
   const now = new Date().toISOString();
   
   const newProduct: Product = {
@@ -170,10 +173,9 @@ export async function createProduct(product: Omit<Product, 'id'>): Promise<strin
     creatorEmail: auth.currentUser?.email || ADMIN_EMAIL
   };
 
-  // 1. Immediately update local cache to prevent UI lag or data loss
+  // 1. Immediately update local cache
   const current = getLocalCachedProducts();
-  const filtered = current.filter(p => p.id !== id);
-  const updatedLocal = deduplicateProducts([newProduct, ...filtered]);
+  const updatedLocal = deduplicateProducts([newProduct, ...current.filter(p => p.id !== id)]);
   saveLocalCachedProducts(updatedLocal);
 
   // 2. Persist to Firestore
@@ -189,7 +191,7 @@ export async function createProduct(product: Omit<Product, 'id'>): Promise<strin
     console.warn('Firestore write failed, product saved locally.');
   }
 
-  return id;
+  return newProduct;
 }
 
 /**
@@ -224,7 +226,7 @@ export async function updateProduct(id: string, updates: Partial<Product>): Prom
 }
 
 /**
- * Deletes a product from Firestore and local cache.
+ * Deletes a product permanently from Firestore and local cache.
  */
 export async function deleteProduct(id: string): Promise<void> {
   // 1. Remove from local cache immediately
@@ -232,11 +234,11 @@ export async function deleteProduct(id: string): Promise<void> {
   const updatedLocal = deduplicateProducts(existing.filter((p) => p.id !== id));
   saveLocalCachedProducts(updatedLocal);
 
-  // 2. Delete from Firestore
+  // 2. Delete permanently from Firestore
   try {
     const docRef = doc(db, 'products', id);
     await deleteDoc(docRef);
-    console.log('Product deleted from Firestore:', id);
+    console.log('Product permanently deleted from Firestore:', id);
   } catch (err) {
     handleFirestoreError(err, OperationType.DELETE, `products/${id}`);
     console.warn('Firestore delete failed, removed locally.');
@@ -253,7 +255,6 @@ export async function recordProductClick(id: string): Promise<void> {
       clicks: (getLocalCachedProducts().find(p => p.id === id)?.clicks || 0) + 1
     });
   } catch (err) {
-    // Non-critical, fallback to updating local cache
     const existing = getLocalCachedProducts();
     const updated = existing.map((p) => 
       p.id === id ? { ...p, clicks: (p.clicks || 0) + 1 } : p

@@ -20,7 +20,7 @@ import { AdminAuthModal } from './components/AdminAuthModal';
 import { AdminDashboard } from './components/AdminDashboard';
 import { AffiliateRedirectModal } from './components/AffiliateRedirectModal';
 import { Footer } from './components/Footer';
-import { Search } from 'lucide-react';
+import { Search, Plus, ShoppingBag } from 'lucide-react';
 
 function ShowcaseContent() {
   const { isAdmin } = useAuth();
@@ -73,17 +73,8 @@ function ShowcaseContent() {
       );
       showToast('Product updated successfully.');
     } else {
-      const newId = await createProduct(productData);
-      const now = new Date().toISOString();
-      const newP: Product = {
-        ...productData,
-        id: newId,
-        clicks: 0,
-        createdAt: now,
-        updatedAt: now,
-        creatorEmail: ADMIN_EMAIL
-      };
-      setProducts((prev) => deduplicateProducts([newP, ...prev]));
+      const newProduct = await createProduct(productData);
+      setProducts((prev) => deduplicateProducts([newProduct, ...prev]));
       showToast('New product added to catalog.');
     }
     setEditingProduct(null);
@@ -255,6 +246,41 @@ function ShowcaseContent() {
               <div className="py-24 flex flex-col items-center justify-center space-y-2">
                 <div className="w-8 h-8 border-2 border-slate-900 dark:border-white border-t-transparent rounded-full animate-spin" />
                 <p className="text-xs text-slate-500 dark:text-slate-400">Loading products...</p>
+              </div>
+            ) : products.length === 0 ? (
+              <div className="py-20 text-center space-y-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8 shadow-2xs max-w-lg mx-auto">
+                <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center mx-auto">
+                  <ShoppingBag className="w-6 h-6" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                    Showcase Catalog is Empty
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-xs mx-auto">
+                    All fake preset items have been cleared. Upload your genuine affiliate products directly to your database.
+                  </p>
+                </div>
+                <div>
+                  {isAdmin ? (
+                    <button
+                      onClick={() => {
+                        setEditingProduct(null);
+                        setIsAddModalOpen(true);
+                      }}
+                      className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-white text-xs font-semibold rounded-lg shadow-xs transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>Upload First Product</span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setIsAuthModalOpen(true)}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-white text-xs font-semibold rounded-lg shadow-xs transition-colors"
+                    >
+                      <span>Admin Sign In</span>
+                    </button>
+                  )}
+                </div>
               </div>
             ) : displayProducts.length === 0 ? (
               <div className="py-16 text-center space-y-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-8">
