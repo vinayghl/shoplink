@@ -1,4 +1,9 @@
 import { Product } from '../types';
+import headphonesImg from '../assets/images/prod_headphones_travertine_1790609992173.jpg';
+import silkImg from '../assets/images/prod_silk_ethnic_wear_1790610007635.jpg';
+import lampImg from '../assets/images/prod_minimalist_sunset_lamp_1790610020721.jpg';
+import teeImg from '../assets/images/prod_streetwear_vintage_tee_1790610032118.jpg';
+import serumImg from '../assets/images/prod_skincare_dew_drops_1790610042742.jpg';
 
 export const INITIAL_PRODUCTS: Product[] = [
   {
@@ -10,7 +15,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     currency: '₹',
     platform: 'Amazon',
     affiliateLink: 'https://www.amazon.in/dp/B09XS7JWHH?tag=affiliate_showcase-21',
-    imageBase64: '/src/assets/images/prod_headphones_travertine_1790609992173.jpg',
+    imageBase64: headphonesImg,
     category: 'Electronics & Tech',
     featured: true,
     tags: ['Audio', 'Headphones', 'Sony'],
@@ -28,7 +33,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     currency: '₹',
     platform: 'Meesho',
     affiliateLink: 'https://www.meesho.com/trending-chanderi-anarkali-suit/p/aff_code_883',
-    imageBase64: '/src/assets/images/prod_silk_ethnic_wear_1790610007635.jpg',
+    imageBase64: silkImg,
     category: 'Fashion & Apparel',
     featured: true,
     tags: ['Ethnic Wear', 'Kurta Set', 'Festive'],
@@ -46,7 +51,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     currency: '₹',
     platform: 'Flipkart',
     affiliateLink: 'https://www.flipkart.com/aesthetic-sunset-projection-lamp/p/itm_aff_491',
-    imageBase64: '/src/assets/images/prod_minimalist_sunset_lamp_1790610020721.jpg',
+    imageBase64: lampImg,
     category: 'Home & Decor',
     featured: false,
     tags: ['Home Decor', 'Lighting', 'Desk Setup'],
@@ -64,7 +69,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     currency: '₹',
     platform: 'Myntra',
     affiliateLink: 'https://www.myntra.com/tshirts/streetwear-oversized-tee/aff_code_9292',
-    imageBase64: '/src/assets/images/prod_streetwear_vintage_tee_1790610032118.jpg',
+    imageBase64: teeImg,
     category: 'Fashion & Apparel',
     featured: true,
     tags: ['Apparel', 'T-Shirt', 'Streetwear'],
@@ -82,7 +87,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     currency: '₹',
     platform: 'Nykaa',
     affiliateLink: 'https://www.nykaa.com/glow-recipe-dew-drops/p/aff_nykaa_8321',
-    imageBase64: '/src/assets/images/prod_skincare_dew_drops_1790610042742.jpg',
+    imageBase64: serumImg,
     category: 'Beauty & Skincare',
     featured: true,
     tags: ['Skincare', 'Serum', 'Beauty'],
