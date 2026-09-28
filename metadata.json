@@ -1,0 +1,6 @@
+{
+  "name": "ShopLink - Affiliate Curated Showcase",
+  "description": "Curated affiliate product showcase and discovery platform for social media campaigns with instant links to Amazon, Flipkart, Meesho, and more.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,74 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Admin authorization check: bootstrapped to designated user email and admins collection
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'v44120621@gmail.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    // Product validation blueprint
+    function isValidProduct(data) {
+      return data.keys().hasAll(['title', 'platform', 'affiliateLink', 'imageBase64', 'price']) &&
+        data.title is string && data.title.size() >= 2 && data.title.size() <= 180 &&
+        data.platform is string && data.platform.size() > 0 && data.platform.size() <= 50 &&
+        data.affiliateLink is string && data.affiliateLink.size() > 0 && data.affiliateLink.size() <= 2048 &&
+        data.imageBase64 is string && data.imageBase64.size() > 0 && data.imageBase64.size() <= 900000 &&
+        data.price is number && data.price >= 0 &&
+        (!('originalPrice' in data) || (data.originalPrice is number && data.originalPrice >= 0)) &&
+        (!('currency' in data) || (data.currency is string && data.currency.size() <= 8)) &&
+        (!('description' in data) || (data.description is string && data.description.size() <= 4000)) &&
+        (!('category' in data) || (data.category is string && data.category.size() <= 60)) &&
+        (!('featured' in data) || data.featured is bool) &&
+        (!('tags' in data) || (data.tags is list && data.tags.size() <= 10)) &&
+        (!('clicks' in data) || (data.clicks is number && data.clicks >= 0)) &&
+        (!('creatorEmail' in data) || (data.creatorEmail is string && data.creatorEmail.size() <= 120));
+    }
+
+    // Public products collection: Anyone can browse; only admin can create/edit/delete;
+    // Visitors can safely increment click count on buy now redirection.
+    match /products/{productId} {
+      allow read: if true;
+      allow create: if isValidId(productId) && isAdmin() && isValidProduct(incoming());
+      allow update: if isValidId(productId) && (
+        (isAdmin() && isValidProduct(incoming())) ||
+        (incoming().diff(existing()).affectedKeys().hasOnly(['clicks']) &&
+         incoming().clicks is number &&
+         incoming().clicks == existing().clicks + 1)
+      );
+      allow delete: if isValidId(productId) && isAdmin();
+    }
+
+    // Admins collection: read by admin, writes blocked directly from client
+    match /admins/{adminId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    // Default deny all other paths
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
