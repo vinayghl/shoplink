@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
-import { testConnection, ADMIN_EMAIL } from './firebase';
+import { testConnection } from './firebase';
 import { Product } from './types';
 import { 
   subscribeToProducts, 
@@ -19,8 +19,10 @@ import { AdminProductModal } from './components/AdminProductModal';
 import { AdminAuthModal } from './components/AdminAuthModal';
 import { AdminDashboard } from './components/AdminDashboard';
 import { AffiliateRedirectModal } from './components/AffiliateRedirectModal';
+import { ErrorModal, ErrorType } from './components/ErrorModal';
 import { Footer } from './components/Footer';
-import { Search, Plus, ShoppingBag } from 'lucide-react';
+import { themeImages } from './assets/themeAssets';
+import { Plus } from 'lucide-react';
 
 function ShowcaseContent() {
   const { isAdmin } = useAuth();
@@ -42,6 +44,7 @@ function ShowcaseContent() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isAdminDashboardOpen, setIsAdminDashboardOpen] = useState(false);
   const [redirectingProduct, setRedirectingProduct] = useState<Product | null>(null);
+  const [activeError, setActiveError] = useState<ErrorType | null>(null);
 
   // Toast notifications
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -53,6 +56,29 @@ function ShowcaseContent() {
 
   useEffect(() => {
     testConnection();
+  }, []);
+
+  // Offline / Network error detection
+  useEffect(() => {
+    const handleOffline = () => {
+      setActiveError('offline');
+    };
+    const handleOnline = () => {
+      setActiveError((prev) => (prev === 'offline' ? null : prev));
+      showToast('Internet connection restored.');
+    };
+
+    window.addEventListener('offline', handleOffline);
+    window.addEventListener('online', handleOnline);
+
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      setActiveError('offline');
+    }
+
+    return () => {
+      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('online', handleOnline);
+    };
   }, []);
 
   useEffect(() => {
@@ -151,9 +177,7 @@ function ShowcaseContent() {
   // Prevent duplicate rendering: If all available products are featured, do not render a duplicate second grid.
   const areAllProductsFeatured = isDefaultHomepage && featuredProducts.length > 0 && nonFeaturedProducts.length === 0;
 
-  // For the secondary catalog grid:
-  // - If on default homepage with both featured & non-featured, show non-featured items so no item appears twice!
-  // - If filtering or searching, show all matching displayProducts.
+  // Secondary catalog grid
   const secondaryProducts = useMemo(() => {
     if (isDefaultHomepage && featuredProducts.length > 0) {
       return nonFeaturedProducts;
@@ -162,11 +186,11 @@ function ShowcaseContent() {
   }, [isDefaultHomepage, featuredProducts.length, nonFeaturedProducts, displayProducts]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200 w-full max-w-full overflow-x-hidden">
+    <div className="min-h-screen flex flex-col bg-transparent text-slate-900 dark:text-slate-100 transition-colors duration-200 w-full max-w-full overflow-x-hidden">
       
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 px-4 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg shadow-xl text-xs font-semibold flex items-center gap-2 animate-in fade-in duration-150">
+        <div className="fixed bottom-6 right-6 z-50 px-4 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl shadow-xl text-xs font-sweetpea font-bold flex items-center gap-2 animate-in fade-in duration-150">
           <span>{toastMessage}</span>
         </div>
       )}
@@ -221,12 +245,12 @@ function ShowcaseContent() {
             {/* FEATURED PRODUCTS SECTION: Displayed on default homepage when featured products exist */}
             {isDefaultHomepage && featuredProducts.length > 0 && (
               <section className="space-y-3.5 sm:space-y-4 min-w-0">
-                <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-200/80 dark:border-slate-800/80">
                   <div className="flex items-baseline gap-2">
-                    <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white uppercase tracking-tight">
+                    <h2 className="font-sweetpea text-sm sm:text-base font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">
                       Featured Products
                     </h2>
-                    <span className="text-xs text-slate-400 dark:text-slate-500">
+                    <span className="font-sweetpea text-xs text-cyan-600 dark:text-cyan-400 font-bold">
                       Recommended picks ({featuredProducts.length})
                     </span>
                   </div>
@@ -248,60 +272,60 @@ function ShowcaseContent() {
               </section>
             )}
 
-            {/* SECONDARY CATALOG SECTION:
-                - If all products are already featured, skip to prevent redundant duplicate listing.
-                - If there are non-featured products, display them under "More Products".
-                - If filtering or searching, display all matching items under the category / query title.
-            */}
+            {/* SECONDARY CATALOG SECTION */}
             {!areAllProductsFeatured && (
               <section className="space-y-3.5 sm:space-y-4 min-w-0">
-                <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-200/80 dark:border-slate-800/80">
                   <div className="flex items-baseline gap-2 min-w-0">
-                    <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white uppercase tracking-tight truncate">
+                    <h2 className="font-sweetpea text-sm sm:text-base font-extrabold text-slate-900 dark:text-white uppercase tracking-tight truncate">
                       {isDefaultHomepage 
                         ? (featuredProducts.length > 0 ? 'More Products' : 'All Products') 
                         : (searchQuery ? `Search Results for "${searchQuery}"` : selectedCategory)
                       }
                     </h2>
                     {selectedPlatform !== 'All' && (
-                      <span className="text-xs text-slate-500 dark:text-slate-400 shrink-0">
+                      <span className="font-sweetpea text-xs text-cyan-600 dark:text-cyan-400 font-bold shrink-0">
                         on {selectedPlatform}
                       </span>
                     )}
                   </div>
                   
-                  <span className="tabular-numbers text-xs text-slate-500 dark:text-slate-400 font-medium shrink-0">
+                  <span className="font-sweetpea tabular-numbers text-xs text-slate-500 dark:text-slate-400 font-bold shrink-0">
                     {secondaryProducts.length} {secondaryProducts.length === 1 ? 'item' : 'items'}
                   </span>
                 </div>
 
                 {loading ? (
                   <div className="py-20 flex flex-col items-center justify-center space-y-2">
-                    <div className="w-8 h-8 border-2 border-slate-900 dark:border-white border-t-transparent rounded-full animate-spin" />
-                    <p className="text-xs text-slate-500 dark:text-slate-400">Loading products...</p>
+                    <div className="w-8 h-8 border-2 border-cyan-500 dark:border-cyan-400 border-t-transparent rounded-full animate-spin" />
+                    <p className="font-sweetpea text-xs text-slate-500 dark:text-slate-400 font-bold">Loading products...</p>
                   </div>
                 ) : products.length === 0 ? (
-                  /* Empty state when database has 0 products */
-                  <div className="py-16 sm:py-20 text-center space-y-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-2xs max-w-lg mx-auto">
-                    <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center mx-auto">
-                      <ShoppingBag className="w-6 h-6" />
+                  /* Empty state when database has 0 products: Uses custom error illustration */
+                  <div className="py-12 sm:py-16 text-center space-y-4 bg-white/90 dark:bg-[#0c121e]/90 backdrop-blur-md rounded-3xl border border-slate-200 dark:border-cyan-500/25 p-6 sm:p-8 shadow-xl max-w-md mx-auto">
+                    <div className="w-32 h-32 mx-auto rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-2 shadow-inner">
+                      <img
+                        src={themeImages.errEmptyBox}
+                        alt="Empty Catalog"
+                        className="w-full h-full object-contain"
+                      />
                     </div>
                     <div className="space-y-1">
-                      <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                      <h3 className="font-sweetpea text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">
                         Showcase Catalog is Empty
                       </h3>
                       <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-xs mx-auto">
-                        All fake preset items have been cleared. Upload your genuine affiliate products directly to your database.
+                        Ready to showcase your genuine affiliate products. Upload your first product to go live.
                       </p>
                     </div>
-                    <div>
+                    <div className="pt-2">
                       {isAdmin ? (
                         <button
                           onClick={() => {
                             setEditingProduct(null);
                             setIsAddModalOpen(true);
                           }}
-                          className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-white text-xs font-semibold rounded-lg shadow-xs transition-colors touch-manipulation min-h-[44px]"
+                          className="font-sweetpea inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-cyan-600 to-teal-600 dark:from-cyan-400 dark:to-teal-300 text-white dark:text-slate-950 font-extrabold text-xs rounded-xl shadow-md transition-all touch-manipulation min-h-[44px]"
                         >
                           <Plus className="w-4 h-4" />
                           <span>Upload First Product</span>
@@ -309,7 +333,7 @@ function ShowcaseContent() {
                       ) : (
                         <button
                           onClick={() => setIsAuthModalOpen(true)}
-                          className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-white text-xs font-semibold rounded-lg shadow-xs transition-colors touch-manipulation min-h-[44px]"
+                          className="font-sweetpea inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-cyan-600 to-teal-600 dark:from-cyan-400 dark:to-teal-300 text-white dark:text-slate-950 font-extrabold text-xs rounded-xl shadow-md transition-all touch-manipulation min-h-[44px]"
                         >
                           <span>Admin Sign In</span>
                         </button>
@@ -317,17 +341,23 @@ function ShowcaseContent() {
                     </div>
                   </div>
                 ) : secondaryProducts.length === 0 ? (
-                  /* No filter matches state */
-                  <div className="py-12 sm:py-16 text-center space-y-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8">
-                    <div className="w-12 h-12 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto text-slate-400">
-                      <Search className="w-5 h-5" />
+                  /* No filter matches state: Uses custom error illustration */
+                  <div className="py-12 sm:py-16 text-center space-y-4 bg-white/90 dark:bg-[#0c121e]/90 backdrop-blur-md rounded-3xl border border-slate-200 dark:border-cyan-500/25 p-6 sm:p-8 max-w-md mx-auto shadow-xl">
+                    <div className="w-28 h-28 mx-auto rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-2 shadow-inner">
+                      <img
+                        src={themeImages.errEmptyBox}
+                        alt="No matching products"
+                        className="w-full h-full object-contain"
+                      />
                     </div>
-                    <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-                      No matching products found
-                    </h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
-                      Try checking your search keywords or clearing your platform filter.
-                    </p>
+                    <div className="space-y-1">
+                      <h3 className="font-sweetpea text-base font-extrabold text-slate-900 dark:text-white">
+                        No matching products found
+                      </h3>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs mx-auto">
+                        Try checking your search keywords or clearing your platform and category filters.
+                      </p>
+                    </div>
                     <div className="pt-1">
                       <button
                         onClick={() => {
@@ -335,7 +365,7 @@ function ShowcaseContent() {
                           setSelectedCategory('All');
                           setSelectedPlatform('All');
                         }}
-                        className="px-4 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors touch-manipulation min-h-[40px]"
+                        className="font-sweetpea px-4 py-2 text-xs font-bold text-white bg-gradient-to-r from-cyan-600 to-teal-600 dark:from-cyan-400 dark:to-teal-300 dark:text-slate-950 rounded-xl shadow-sm hover:brightness-105 transition-all touch-manipulation min-h-[40px]"
                       >
                         Reset filters
                       </button>
@@ -391,10 +421,18 @@ function ShowcaseContent() {
         onClose={() => setRedirectingProduct(null)}
       />
 
+      {/* Custom Error Modal (404, No Internet, etc.) */}
+      <ErrorModal
+        type={activeError}
+        onClose={() => setActiveError(null)}
+        onRetry={() => window.location.reload()}
+      />
+
       {/* Footer */}
       <Footer
         onOpenAuthModal={() => setIsAuthModalOpen(true)}
         onOpenAdminDashboard={() => setIsAdminDashboardOpen(true)}
+        onOpenErrorModal={(err) => setActiveError(err)}
       />
 
     </div>
