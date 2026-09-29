@@ -14,14 +14,17 @@ import {
 import { Navbar } from './components/Navbar';
 import { HeroCreatorBanner } from './components/HeroCreatorBanner';
 import { ProductCard } from './components/ProductCard';
-import { ProductDetailModal } from './components/ProductDetailModal';
-import { AdminProductModal } from './components/AdminProductModal';
-import { AdminAuthModal } from './components/AdminAuthModal';
-import { AdminDashboard } from './components/AdminDashboard';
-import { AffiliateRedirectModal } from './components/AffiliateRedirectModal';
-import { ErrorModal, ErrorType } from './components/ErrorModal';
 import { Footer } from './components/Footer';
 import { Plus, WifiOff, X } from 'lucide-react';
+import type { ErrorType } from './components/ErrorModal';
+
+// Performance optimization: Lazy-load modals and admin dashboard so initial page payload is minimal
+const ProductDetailModal = React.lazy(() => import('./components/ProductDetailModal').then(m => ({ default: m.ProductDetailModal })));
+const AdminProductModal = React.lazy(() => import('./components/AdminProductModal').then(m => ({ default: m.AdminProductModal })));
+const AdminAuthModal = React.lazy(() => import('./components/AdminAuthModal').then(m => ({ default: m.AdminAuthModal })));
+const AdminDashboard = React.lazy(() => import('./components/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
+const AffiliateRedirectModal = React.lazy(() => import('./components/AffiliateRedirectModal').then(m => ({ default: m.AffiliateRedirectModal })));
+const ErrorModal = React.lazy(() => import('./components/ErrorModal').then(m => ({ default: m.ErrorModal })));
 
 function ShowcaseContent() {
   const { isAdmin } = useAuth();
@@ -225,16 +228,23 @@ function ShowcaseContent() {
       {/* ADMIN WORKSPACE: Dedicated management screen when Admin Mode is open */}
       {isAdmin && isAdminDashboardOpen ? (
         <main className="flex-1 w-full max-w-full min-w-0">
-          <AdminDashboard
-            products={products}
-            onOpenAddModal={() => {
-              setEditingProduct(null);
-              setIsAddModalOpen(true);
-            }}
-            onEditProduct={handleEditClick}
-            onDeleteProduct={handleDeleteProduct}
-            onCloseDashboard={() => setIsAdminDashboardOpen(false)}
-          />
+          <React.Suspense fallback={
+            <div className="py-24 text-center">
+              <div className="w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+              <p className="font-sweetpea text-xs text-slate-500 font-bold">Loading admin dashboard...</p>
+            </div>
+          }>
+            <AdminDashboard
+              products={products}
+              onOpenAddModal={() => {
+                setEditingProduct(null);
+                setIsAddModalOpen(true);
+              }}
+              onEditProduct={handleEditClick}
+              onDeleteProduct={handleDeleteProduct}
+              onCloseDashboard={() => setIsAdminDashboardOpen(false)}
+            />
+          </React.Suspense>
         </main>
       ) : (
         /* PUBLIC STOREFRONT: Products, Hero, and Category Browsing */
@@ -393,40 +403,51 @@ function ShowcaseContent() {
         </main>
       )}
 
-      {/* Modals */}
-      <ProductDetailModal
-        product={selectedProductDetail}
-        onClose={() => setSelectedProductDetail(null)}
-        onBuyClick={handleBuyClick}
-        onEdit={handleEditClick}
-      />
+      {/* Modals wrapped in Suspense for zero initial load impact */}
+      <React.Suspense fallback={null}>
+        {selectedProductDetail && (
+          <ProductDetailModal
+            product={selectedProductDetail}
+            onClose={() => setSelectedProductDetail(null)}
+            onBuyClick={handleBuyClick}
+            onEdit={handleEditClick}
+          />
+        )}
 
-      <AdminProductModal
-        isOpen={isAddModalOpen}
-        onClose={() => {
-          setIsAddModalOpen(false);
-          setEditingProduct(null);
-        }}
-        onSave={handleSaveProduct}
-        editProduct={editingProduct}
-      />
+        {isAddModalOpen && (
+          <AdminProductModal
+            isOpen={isAddModalOpen}
+            onClose={() => {
+              setIsAddModalOpen(false);
+              setEditingProduct(null);
+            }}
+            onSave={handleSaveProduct}
+            editProduct={editingProduct}
+          />
+        )}
 
-      <AdminAuthModal
-        isOpen={isAuthModalOpen}
-        onClose={() => setIsAuthModalOpen(false)}
-      />
+        {isAuthModalOpen && (
+          <AdminAuthModal
+            isOpen={isAuthModalOpen}
+            onClose={() => setIsAuthModalOpen(false)}
+          />
+        )}
 
-      <AffiliateRedirectModal
-        product={redirectingProduct}
-        onClose={() => setRedirectingProduct(null)}
-      />
+        {redirectingProduct && (
+          <AffiliateRedirectModal
+            product={redirectingProduct}
+            onClose={() => setRedirectingProduct(null)}
+          />
+        )}
 
-      {/* Custom Error Modal: displayed only when explicitly triggered (e.g. from footer test button) */}
-      <ErrorModal
-        type={activeError}
-        onClose={() => setActiveError(null)}
-        onRetry={() => window.location.reload()}
-      />
+        {activeError && (
+          <ErrorModal
+            type={activeError}
+            onClose={() => setActiveError(null)}
+            onRetry={() => window.location.reload()}
+          />
+        )}
+      </React.Suspense>
 
       {/* Footer */}
       <Footer

@@ -20,6 +20,25 @@ export default defineConfig(() => {
       outDir: 'dist',
       assetsDir: 'assets',
       emptyOutDir: true,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('firebase')) {
+                return 'vendor-firebase';
+              }
+              if (id.includes('lucide-react')) {
+                return 'vendor-lucide';
+              }
+              if (id.includes('react') || id.includes('scheduler')) {
+                return 'vendor-react';
+              }
+              return 'vendor-core';
+            }
+          },
+        },
+      },
+      chunkSizeWarningLimit: 800,
     },
     server: {
       hmr: process.env.DISABLE_HMR !== 'true',

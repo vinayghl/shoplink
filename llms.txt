@@ -1,0 +1,26 @@
+# ShopLink – Curated Creator Deals & Product Showcase
+
+> Handpicked creator deals, verified discounts, and direct affiliate links across Amazon, Flipkart, Meesho, and Myntra.
+
+ShopLink is a high-performance web storefront designed for creators and shoppers to discover verified e-commerce recommendations, direct affiliate links, discount alerts, and authentic product reviews.
+
+## Core Catalogs & Pages
+
+- [Home & Featured Showcase](https://shoplink-beta.vercel.app/): Explore curated creator deals, recommended technology, fashion, lifestyle, and home products.
+- [XML Sitemap](https://shoplink-beta.vercel.app/sitemap.xml): Index of searchable routes and canonical URL structure for crawlers.
+- [Robots Policy](https://shoplink-beta.vercel.app/robots.txt): Search engine indexing and agent crawling directives.
+- [Full LLM Index](https://shoplink-beta.vercel.app/llms-full.txt): Comprehensive plain-text dataset for deep reasoning and query context.
+- [WebMCP Manifest](https://shoplink-beta.vercel.app/.well-known/webmcp.json): Web Model Context Protocol specification for autonomous browsing agents.
+
+## Supported Marketplaces
+
+- **Amazon India**: Electronics, studio audio gear, home decor, lifestyle gadgets.
+- **Flipkart**: Smartphones, audio accessories, smart home devices, lifestyle fashion.
+- **Meesho**: Budget apparel, handcrafted ethnic wear, affordable home utilities.
+- **Myntra**: Premium streetwear, formal apparel, luxury footwear, skincare brands.
+
+## Available Agent Tools & Actions
+
+Autonomous AI agents can interact with the page using declarative form tools or the `document.modelContext` WebMCP API:
+- `search_products`: Filter catalog items by query keywords, category, or marketplace platform.
+- `get_featured_deals`: Fetch top-ranked discount offers, real-time pricing, and direct affiliate destination links.

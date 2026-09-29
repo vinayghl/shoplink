@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "ShopLink WebMCP Manifest",
+  "version": "1.0.0",
+  "description": "Web Model Context Protocol (WebMCP) tool registry for autonomous AI agents navigating ShopLink.",
+  "tools": [
+    {
+      "name": "search_products",
+      "description": "Search curated creator deals and products by keyword, category, or marketplace platform.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Search terms to match in product titles, tags, or descriptions."
+          },
+          "category": {
+            "type": "string",
+            "description": "Category filter (e.g. All, Tech, Fashion, Ethnic, Skincare, Home)."
+          },
+          "platform": {
+            "type": "string",
+            "description": "Marketplace platform filter (e.g. All, Amazon, Flipkart, Meesho, Myntra)."
+          }
+        },
+        "required": []
+      },
+      "returns": {
+        "type": "array",
+        "description": "List of matching product deals with prices, discounts, and direct affiliate links."
+      }
+    },
+    {
+      "name": "get_featured_deals",
+      "description": "Retrieve featured creator picks and verified discount offers.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "sortBy": {
+            "type": "string",
+            "enum": ["featured", "popular", "newest", "price-low", "price-high"],
+            "description": "Desired sort order for returned deals."
+          }
+        }
+      },
+      "returns": {
+        "type": "array",
+        "description": "Ranked array of featured products."
+      }
+    }
+  ]
+}

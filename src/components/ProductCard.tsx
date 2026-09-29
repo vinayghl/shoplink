@@ -65,6 +65,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           src={product.imageBase64}
           alt={product.title}
           loading="lazy"
+          decoding="async"
+          width="400"
+          height="400"
           referrerPolicy="no-referrer"
           className="w-full h-full object-cover object-center group-hover:scale-[1.03] transition-transform duration-300 ease-out"
         />

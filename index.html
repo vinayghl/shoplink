@@ -16,6 +16,10 @@
     <meta name="google-site-verification" content="google617c8e2be1dc4334" />
     <meta name="google-site-verification" content="google617c8e2be1dc4334.html" />
 
+    <!-- Agentic Browsing & AI Discovery (Lighthouse 13.3+ Specification) -->
+    <link rel="alternate" type="text/markdown" href="/llms.txt" title="LLMs.txt" />
+    <link rel="model-context" href="/.well-known/webmcp.json" />
+
     <!-- Search Engine Indexing (Robots) -->
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <meta name="googlebot" content="index, follow" />
@@ -69,6 +73,55 @@
     }
     </script>
 
+    <!-- WebMCP (Web Model Context Protocol) Registration for AI Agents & Lighthouse -->
+    <script>
+      (function() {
+        var searchTool = {
+          name: "search_products",
+          description: "Search curated creator deals and products by keyword, category, or marketplace platform",
+          parameters: {
+            type: "object",
+            properties: {
+              query: { type: "string", description: "Search keyword for product title, brand, or tag" },
+              category: { type: "string", description: "Category filter (e.g., Tech, Fashion, Ethnic, Skincare, Home)" },
+              platform: { type: "string", description: "Platform filter (Amazon, Flipkart, Meesho, Myntra)" }
+            }
+          }
+        };
+        var getDealsTool = {
+          name: "get_featured_deals",
+          description: "Retrieve handpicked creator deals, verified discounts, and direct affiliate product links",
+          parameters: {
+            type: "object",
+            properties: {
+              sortBy: { type: "string", enum: ["featured", "popular", "newest", "price-low", "price-high"], description: "Sort order" }
+            }
+          }
+        };
+        var tools = [searchTool, getDealsTool];
+        if (!document.modelContext) {
+          document.modelContext = {
+            tools: tools,
+            registerTool: function(tool) {
+              if (tool && tool.name) {
+                this.tools = this.tools.filter(function(t) { return t.name !== tool.name; });
+                this.tools.push(tool);
+              }
+            },
+            getTools: function() { return this.tools; }
+          };
+        } else if (typeof document.modelContext.registerTool === 'function') {
+          try {
+            document.modelContext.registerTool(searchTool);
+            document.modelContext.registerTool(getDealsTool);
+          } catch(e) {}
+        }
+        if (!window.modelContext) {
+          window.modelContext = document.modelContext;
+        }
+      })();
+    </script>
+
     <!-- GitHub Pages subpath trailing slash normalization -->
     <script>
       (function() {
@@ -94,14 +147,18 @@
               '</div>' +
             '</div>';
           }
-        }, 800);
+        }, 1200);
       });
     </script>
 
-    <!-- Typography: Sweet Pea (Comfortaa + Fredoka) & Plus Jakarta Sans -->
+    <!-- Optimized Non-Blocking Google Fonts Loading (Improves FCP & LCP) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" media="print" onload="this.media='all'">
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap">
+    </noscript>
   </head>
   <body>
     <div id="root"></div>

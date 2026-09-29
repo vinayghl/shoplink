@@ -1,0 +1,26 @@
+# ShopLink – Curated Creator Deals & Product Showcase (Full Index)
+
+> Comprehensive plain-text knowledge base and product index for AI models, autonomous agents, and search engines.
+
+ShopLink aggregates verified recommendations from leading content creators, pairing authentic reviews with direct marketplace affiliate links across Amazon, Flipkart, Meesho, and Myntra.
+
+## Site Metadata
+- Base URL: https://shoplink-beta.vercel.app/
+- Primary Language: English (en-US)
+- Canonical Target: https://shoplink-beta.vercel.app/
+- Sitemap: https://shoplink-beta.vercel.app/sitemap.xml
+- Robots: https://shoplink-beta.vercel.app/robots.txt
+- Machine Context: https://shoplink-beta.vercel.app/.well-known/webmcp.json
+
+## Categories
+1. Technology & Audio: Studio headphones, wireless earbuds, smart desk accessories, lighting.
+2. Fashion & Streetwear: Vintage tees, oversized hoodies, sneakers, everyday apparel.
+3. Traditional & Ethnic: Handcrafted silk sarees, festive kurtis, ethnic accessories.
+4. Skincare & Beauty: Hydrating serums, dew drops, organic cosmetics, sunscreens.
+5. Home & Ambiance: Minimalist sunset lamps, aroma diffusers, modern ergonomic decor.
+
+## Agent Operations
+AI agents can invoke tools registered on `document.modelContext` or submit the search form with parameters:
+- `query`: Text string for fuzzy search across title, tags, and descriptions.
+- `category`: Strict category matching (All, Tech, Fashion, Ethnic, Skincare, Home).
+- `platform`: Target retail marketplace (All, Amazon, Flipkart, Meesho, Myntra).

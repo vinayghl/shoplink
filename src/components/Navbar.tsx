@@ -117,11 +117,23 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Right Controls */}
           <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-            {/* Desktop Search Input */}
-            <div className="hidden sm:flex relative items-center w-48 lg:w-60">
+            {/* Desktop Search Input with WebMCP Declarative Tool annotations */}
+            <form 
+              role="search"
+              aria-label="Product search"
+              // @ts-expect-error WebMCP declarative attribute
+              toolname="search_products"
+              tooldescription="Search products and creator deals by keyword, category, or marketplace platform"
+              onSubmit={(e) => e.preventDefault()}
+              className="hidden sm:flex relative items-center w-48 lg:w-60"
+            >
               <Search className="absolute left-3 w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
               <input
                 type="text"
+                name="query"
+                // @ts-expect-error WebMCP parameter
+                toolparam="query"
+                aria-label="Search products"
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -129,6 +141,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               />
               {searchQuery && (
                 <button
+                  type="button"
                   onClick={() => setSearchQuery('')}
                   className="absolute right-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                   aria-label="Clear search"
@@ -136,7 +149,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <X className="w-3.5 h-3.5" />
                 </button>
               )}
-            </div>
+            </form>
 
             {/* Mobile Search Toggle */}
             <button
@@ -235,10 +248,17 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Mobile Search Expandable */}
         {isSearchOpen && (
           <div className="sm:hidden pb-3 pt-1">
-            <div className="relative">
+            <form 
+              role="search"
+              aria-label="Mobile product search"
+              onSubmit={(e) => e.preventDefault()}
+              className="relative"
+            >
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
+                name="query_mobile"
+                aria-label="Search products"
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -247,6 +267,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               />
               {searchQuery && (
                 <button
+                  type="button"
                   onClick={() => setSearchQuery('')}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
                   aria-label="Clear mobile search"
@@ -254,7 +275,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <X className="w-3.5 h-3.5" />
                 </button>
               )}
-            </div>
+            </form>
           </div>
         )}
 
