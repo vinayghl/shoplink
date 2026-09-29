@@ -21,8 +21,7 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { AffiliateRedirectModal } from './components/AffiliateRedirectModal';
 import { ErrorModal, ErrorType } from './components/ErrorModal';
 import { Footer } from './components/Footer';
-import { themeImages } from './assets/themeAssets';
-import { Plus } from 'lucide-react';
+import { Plus, WifiOff, X } from 'lucide-react';
 
 function ShowcaseContent() {
   const { isAdmin } = useAuth();
@@ -45,6 +44,7 @@ function ShowcaseContent() {
   const [isAdminDashboardOpen, setIsAdminDashboardOpen] = useState(false);
   const [redirectingProduct, setRedirectingProduct] = useState<Product | null>(null);
   const [activeError, setActiveError] = useState<ErrorType | null>(null);
+  const [isOffline, setIsOffline] = useState(false);
 
   // Toast notifications
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -58,22 +58,18 @@ function ShowcaseContent() {
     testConnection();
   }, []);
 
-  // Offline / Network error detection
+  // Graceful offline detection: Never blocks the screen with an aggressive modal
   useEffect(() => {
     const handleOffline = () => {
-      setActiveError('offline');
+      setIsOffline(true);
     };
     const handleOnline = () => {
-      setActiveError((prev) => (prev === 'offline' ? null : prev));
+      setIsOffline(false);
       showToast('Internet connection restored.');
     };
 
     window.addEventListener('offline', handleOffline);
     window.addEventListener('online', handleOnline);
-
-    if (typeof navigator !== 'undefined' && !navigator.onLine) {
-      setActiveError('offline');
-    }
 
     return () => {
       window.removeEventListener('offline', handleOffline);
@@ -174,7 +170,7 @@ function ShowcaseContent() {
   // Check if we are on default unfiltered homepage view
   const isDefaultHomepage = !searchQuery && selectedCategory === 'All' && selectedPlatform === 'All';
 
-  // Prevent duplicate rendering: If all available products are featured, do not render a duplicate second grid.
+  // Prevent duplicate rendering
   const areAllProductsFeatured = isDefaultHomepage && featuredProducts.length > 0 && nonFeaturedProducts.length === 0;
 
   // Secondary catalog grid
@@ -192,6 +188,21 @@ function ShowcaseContent() {
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 px-4 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl shadow-xl text-xs font-sweetpea font-bold flex items-center gap-2 animate-in fade-in duration-150">
           <span>{toastMessage}</span>
+        </div>
+      )}
+
+      {/* Non-intrusive offline status banner: Never blocks the screen */}
+      {isOffline && (
+        <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 px-4 py-1.5 rounded-full bg-slate-900/95 dark:bg-slate-800/95 text-white text-xs font-sweetpea font-bold flex items-center gap-2 shadow-2xl backdrop-blur-md border border-cyan-500/40 animate-in fade-in slide-in-from-top-2">
+          <WifiOff className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+          <span>Offline mode · Showing cached products</span>
+          <button 
+            onClick={() => setIsOffline(false)} 
+            className="ml-1 p-0.5 rounded-full hover:bg-slate-700 text-slate-400 hover:text-white"
+            aria-label="Dismiss offline notice"
+          >
+            <X className="w-3 h-3" />
+          </button>
         </div>
       )}
 
@@ -242,7 +253,7 @@ function ShowcaseContent() {
 
           <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8 sm:space-y-10 min-w-0">
 
-            {/* FEATURED PRODUCTS SECTION: Displayed on default homepage when featured products exist */}
+            {/* FEATURED PRODUCTS SECTION */}
             {isDefaultHomepage && featuredProducts.length > 0 && (
               <section className="space-y-3.5 sm:space-y-4 min-w-0">
                 <div className="flex items-center justify-between pb-2 border-b border-slate-200/80 dark:border-slate-800/80">
@@ -301,21 +312,17 @@ function ShowcaseContent() {
                     <p className="font-sweetpea text-xs text-slate-500 dark:text-slate-400 font-bold">Loading products...</p>
                   </div>
                 ) : products.length === 0 ? (
-                  /* Empty state when database has 0 products: Uses custom error illustration */
+                  /* Empty state when database has 0 products */
                   <div className="py-12 sm:py-16 text-center space-y-4 bg-white/90 dark:bg-[#0c121e]/90 backdrop-blur-md rounded-3xl border border-slate-200 dark:border-cyan-500/25 p-6 sm:p-8 shadow-xl max-w-md mx-auto">
-                    <div className="w-32 h-32 mx-auto rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-2 shadow-inner">
-                      <img
-                        src={themeImages.errEmptyBox}
-                        alt="Empty Catalog"
-                        className="w-full h-full object-contain"
-                      />
+                    <div className="w-24 h-24 mx-auto rounded-2xl bg-cyan-500/10 flex items-center justify-center text-cyan-500">
+                      <Plus className="w-10 h-10" />
                     </div>
                     <div className="space-y-1">
                       <h3 className="font-sweetpea text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">
-                        Showcase Catalog is Empty
+                        Showcase Catalog is Ready
                       </h3>
                       <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-xs mx-auto">
-                        Ready to showcase your genuine affiliate products. Upload your first product to go live.
+                        Ready to showcase your affiliate deals. Upload your products to go live.
                       </p>
                     </div>
                     <div className="pt-2">
@@ -341,15 +348,8 @@ function ShowcaseContent() {
                     </div>
                   </div>
                 ) : secondaryProducts.length === 0 ? (
-                  /* No filter matches state: Uses custom error illustration */
+                  /* No filter matches state */
                   <div className="py-12 sm:py-16 text-center space-y-4 bg-white/90 dark:bg-[#0c121e]/90 backdrop-blur-md rounded-3xl border border-slate-200 dark:border-cyan-500/25 p-6 sm:p-8 max-w-md mx-auto shadow-xl">
-                    <div className="w-28 h-28 mx-auto rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-2 shadow-inner">
-                      <img
-                        src={themeImages.errEmptyBox}
-                        alt="No matching products"
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
                     <div className="space-y-1">
                       <h3 className="font-sweetpea text-base font-extrabold text-slate-900 dark:text-white">
                         No matching products found
@@ -421,7 +421,7 @@ function ShowcaseContent() {
         onClose={() => setRedirectingProduct(null)}
       />
 
-      {/* Custom Error Modal (404, No Internet, etc.) */}
+      {/* Custom Error Modal: displayed only when explicitly triggered (e.g. from footer test button) */}
       <ErrorModal
         type={activeError}
         onClose={() => setActiveError(null)}

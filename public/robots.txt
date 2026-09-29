@@ -1,0 +1,11 @@
+# Robots.txt for ShopLink (https://shoplink-beta.vercel.app)
+User-agent: *
+Allow: /
+
+# Disallow admin management routes and API endpoints from indexing
+Disallow: /admin
+Disallow: /api/
+Disallow: /*?*admin=*
+
+# Production Sitemap Location
+Sitemap: https://shoplink-beta.vercel.app/sitemap.xml

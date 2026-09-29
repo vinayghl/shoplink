@@ -1,6 +1,6 @@
 {
-  "name": "ShopLink - Affiliate Curated Showcase",
-  "description": "Curated affiliate product showcase and discovery platform for social media campaigns with instant links to Amazon, Flipkart, Meesho, and more.",
+  "name": "ShopLink – Curated Creator Deals & Product Showcase",
+  "description": "Discover handpicked creator deals, verified discounts, and direct affiliate links across Amazon, Flipkart, Meesho, and Myntra on ShopLink.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

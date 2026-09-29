@@ -19,14 +19,14 @@
     overflow-x: hidden;
   }
 
-  /* Light Theme: Textured 3D geometric white blocks background from user image */
+  /* Light Theme: Textured 3D geometric white blocks background */
   body {
     font-family: var(--font-sans);
     color: #0f172a;
     background-color: #f8fafc;
     background-image: 
-      linear-gradient(to bottom, rgba(248, 250, 252, 0.82), rgba(241, 245, 249, 0.88)),
-      url('/src/assets/images/bg_light_theme_1790694484318.jpg');
+      linear-gradient(to bottom, rgba(248, 250, 252, 0.84), rgba(241, 245, 249, 0.90)),
+      url('/assets/images/bg_light_theme_1790694484318.jpg');
     background-size: cover, cover;
     background-position: center top;
     background-attachment: fixed;
@@ -38,15 +38,15 @@
     overflow-x: hidden;
   }
 
-  /* Dark Theme: Textured sleek diagonal neon cyan bars background from user image */
+  /* Dark Theme: Textured sleek diagonal neon cyan bars background */
   .dark body,
   body.dark,
   :root.dark body {
     color: #f1f5f9;
     background-color: #070b12;
     background-image: 
-      linear-gradient(to bottom, rgba(7, 11, 18, 0.82), rgba(8, 13, 22, 0.88)),
-      url('/src/assets/images/bg_dark_theme_1790694471314.jpg');
+      linear-gradient(to bottom, rgba(7, 11, 18, 0.84), rgba(8, 13, 22, 0.90)),
+      url('/assets/images/bg_dark_theme_1790694471314.jpg');
     background-size: cover, cover;
     background-position: center top;
     background-attachment: fixed;

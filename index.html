@@ -3,18 +3,72 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ShopLink - Affiliate Curated Showcase</title>
-    <meta name="description" content="Curated affiliate product showcase and discovery platform for social media campaigns with instant links to Amazon, Flipkart, Meesho, and more." />
-    <meta property="og:title" content="ShopLink - Affiliate Curated Showcase" />
-    <meta property="og:description" content="Curated affiliate product showcase and discovery platform for social media campaigns with instant links to Amazon, Flipkart, Meesho, and more." />
+    
+    <!-- Primary SEO Meta Tags -->
+    <title>ShopLink – Curated Creator Deals & Product Showcase</title>
+    <meta name="title" content="ShopLink – Curated Creator Deals & Product Showcase" />
+    <meta name="description" content="Discover handpicked creator deals, verified discounts, and direct affiliate links across Amazon, Flipkart, Meesho, and Myntra on ShopLink." />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://shoplink-beta.vercel.app/" />
+
+    <!-- Search Engine Indexing (Robots) -->
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow" />
+
+    <!-- Open Graph / Facebook / LinkedIn -->
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://shoplink-beta.vercel.app/" />
+    <meta property="og:site_name" content="ShopLink" />
+    <meta property="og:title" content="ShopLink – Curated Creator Deals & Product Showcase" />
+    <meta property="og:description" content="Discover handpicked creator deals, verified discounts, and direct affiliate links across Amazon, Flipkart, Meesho, and Myntra on ShopLink." />
+    <meta property="og:image" content="https://shoplink-beta.vercel.app/assets/images/bg_dark_theme_1790694471314.jpg" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter / X -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://shoplink-beta.vercel.app/" />
+    <meta name="twitter:title" content="ShopLink – Curated Creator Deals & Product Showcase" />
+    <meta name="twitter:description" content="Discover handpicked creator deals, verified discounts, and direct affiliate links across Amazon, Flipkart, Meesho, and Myntra on ShopLink." />
+    <meta name="twitter:image" content="https://shoplink-beta.vercel.app/assets/images/bg_dark_theme_1790694471314.jpg" />
+
+    <!-- Schema.org Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://shoplink-beta.vercel.app/#website",
+          "url": "https://shoplink-beta.vercel.app/",
+          "name": "ShopLink",
+          "description": "Curated creator deals and verified affiliate product showcase.",
+          "inLanguage": "en-US",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://shoplink-beta.vercel.app/?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "CollectionPage",
+          "@id": "https://shoplink-beta.vercel.app/#webpage",
+          "url": "https://shoplink-beta.vercel.app/",
+          "name": "ShopLink – Curated Creator Deals & Product Showcase",
+          "isPartOf": {
+            "@id": "https://shoplink-beta.vercel.app/#website"
+          },
+          "description": "Discover handpicked creator deals, verified discounts, and direct affiliate links across Amazon, Flipkart, Meesho, and Myntra.",
+          "inLanguage": "en-US"
+        }
+      ]
+    }
+    </script>
 
     <!-- GitHub Pages subpath trailing slash normalization -->
     <script>
       (function() {
         var path = window.location.pathname;
-        // If loaded on GitHub Pages without trailing slash (e.g. /repo), normalize to /repo/ so relative assets resolve properly
         if (path && !path.endsWith('/') && !path.split('/').pop().includes('.')) {
           window.location.replace(path + '/' + window.location.search + window.location.hash);
         }
@@ -40,6 +94,7 @@
       });
     </script>
 
+    <!-- Typography: Sweet Pea (Comfortaa + Fredoka) & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
