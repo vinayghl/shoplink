@@ -18,6 +18,19 @@
       ]
     },
     {
+      "source": "/ads.txt",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/plain; charset=utf-8"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, stale-while-revalidate=604800"
+        }
+      ]
+    },
+    {
       "source": "/sitemap.xml",
       "headers": [
         {
@@ -72,7 +85,7 @@
   ],
   "rewrites": [
     {
-      "source": "/((?!assets/|robots\\.txt|sitemap\\.xml|llms\\.txt|llms-full\\.txt|google.*\\.html|.*\\..*).*)",
+      "source": "/((?!assets/|robots\\.txt|sitemap\\.xml|ads\\.txt|llms\\.txt|llms-full\\.txt|google.*\\.html|.*\\..*).*)",
       "destination": "/index.html"
     }
   ]
